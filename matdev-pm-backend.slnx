@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="matdev.API/matdev.API.csproj" />
+  <Project Path="matdev.Application/matdev.Application.csproj" />
+  <Project Path="matdev.Domain/matdev.Domain.csproj" />
+  <Project Path="matdev.Infrastructure/matdev.Infrastructure.csproj" />
+  <Project Path="matdev.UnitTests/matdev.UnitTests.csproj" />
+</Solution>
