@@ -1,8 +1,10 @@
-﻿using System;
+﻿using matdev.Domain.Entities;
+using matdev.Domain.Entities.LookupEntities;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace matdev.Domain.Entities
+namespace matdev.Domain.Entities.TaskEntities
 {
     public class _Task
     {
@@ -27,7 +29,7 @@ namespace matdev.Domain.Entities
         public _Task ParentTask { get; set; }
         public User Requester { get; set; }
 
-        public ICollection<TaskAssigment> Assigments { get; set; }
+        public ICollection<TaskAssignment> Assigments { get; set; }
         public ICollection<TimeEntry> TimeEntries { get; set; }
 
 

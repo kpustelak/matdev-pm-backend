@@ -15,4 +15,8 @@
     <ProjectReference Include="..\matdev.Domain\matdev.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\Migrations\" />
+  </ItemGroup>
+
 </Project>

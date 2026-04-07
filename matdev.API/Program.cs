@@ -14,7 +14,8 @@ builder.Services.AddSwaggerGen();
 
 
 // Register dependencies And Use InMemory Database
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase("matdevDb"));
+builder.Services.AddDbContext<ApplicationDbContext>(
+    options => options.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
 
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();

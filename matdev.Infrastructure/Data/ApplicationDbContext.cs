@@ -1,5 +1,8 @@
 ﻿using matdev.Domain.Entities;
-using matdev.Domain.Entities.Lab;
+using matdev.Domain.Entities.BudgetEntities;
+using matdev.Domain.Entities.LabEntities;
+using matdev.Domain.Entities.LookupEntities;
+using matdev.Domain.Entities.TaskEntities;
 using Microsoft.EntityFrameworkCore;
 
 namespace matdev.Infrastructure.Data
@@ -15,7 +18,7 @@ namespace matdev.Infrastructure.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<_Task> Tasks { get; set; }
-        public DbSet<TaskAssigment> TaskAssigments { get; set; }
+        public DbSet<TaskAssignment> TaskAssignments { get; set; }
         public DbSet<TimeEntry> TimeEntries { get; set; }
         public DbSet<IssueType> IssueTypes { get; set; }
         public DbSet<Workpackage> Workpackages { get; set; }
@@ -24,8 +27,11 @@ namespace matdev.Infrastructure.Data
         public DbSet<Status> Statuses { get; set; }
         public DbSet<LabOrder> LabOrders { get; set; }
         public DbSet<LabOrderStatus> LabOrderStatuses { get; set; }
-        public DbSet<LabOrderAssigment> LabOrderAssigments { get; set; }
+        public DbSet<LabOrderAssignment> LabOrderAssignments { get; set; }
         public DbSet<TaskDependency> TaskDependencies { get; set; }
+        public DbSet<BudgetCategory> BudgetCategories { get; set; }
+        public DbSet<BudgetExpenditure> BudgetExpenditures { get; set; }
+        public DbSet<BudgetPlan> BudgetPlans { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -83,9 +89,9 @@ namespace matdev.Infrastructure.Data
             });
 
             // TaskAssigment
-            modelBuilder.Entity<TaskAssigment>(entity =>
+            modelBuilder.Entity<TaskAssignment>(entity =>
             {
-                entity.HasKey(a => a.TaskAssigmentID);
+                entity.HasKey(a => a.TaskAssignmentID);
                 entity.HasOne(a => a.User).WithMany(u => u.TaskAssigments).HasForeignKey(a => a.UserID).OnDelete(DeleteBehavior.Cascade);
                 entity.HasOne(a => a.Task).WithMany(t => t.Assigments).HasForeignKey(a => a.TaskID).OnDelete(DeleteBehavior.Cascade);
             });
@@ -152,19 +158,60 @@ namespace matdev.Infrastructure.Data
             });
 
             // LabOrderAssigment
-            modelBuilder.Entity<LabOrderAssigment>(entity =>
+            modelBuilder.Entity<LabOrderAssignment>(entity =>
             {
-                entity.HasKey(a => a.LabOrderAssigmentID);
+                entity.HasKey(a => a.LabOrderAssignmentID);
                 entity.HasOne(a => a.LabOrder).WithMany().HasForeignKey(a => a.LabOrderID).OnDelete(DeleteBehavior.Cascade);
                 entity.HasOne(a => a.Project).WithMany(p => p.LabOrderAssigments).HasForeignKey(a => a.ProjectID).OnDelete(DeleteBehavior.Cascade);
             });
 
-            // TaskDependency dodac relacje do Task i User
+            // TaskDependency
             modelBuilder.Entity<TaskDependency>(entity =>
             {
                 entity.HasKey(d => d.TaskDependencyID);
                 entity.Property(d => d.DependencyType).IsRequired();
                 entity.Property(d => d.LagTime).HasDefaultValue(0);
+                entity.HasOne(d => d.Predecessor)
+                      .WithMany()
+                      .HasForeignKey(d => d.PredecessorID)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(d => d.Successor)
+                      .WithMany()
+                      .HasForeignKey(d => d.SuccessorID)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // BudgetCategory
+            modelBuilder.Entity<BudgetCategory>(entity =>
+            {
+                entity.HasKey(bc => bc.CategoryID);
+                entity.Property(bc => bc.Name).IsRequired().HasMaxLength(200);
+                entity.Property(bc => bc.DefaultAlertThreshold).HasPrecision(18, 2).HasDefaultValue(0m);
+                entity.HasMany(bc => bc.Expenditures).WithOne(e => e.BudgetCategory).HasForeignKey(e => e.BudgetCategoryID).OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // BudgetPlan
+            modelBuilder.Entity<BudgetPlan>(entity =>
+            {
+                entity.HasKey(bp => bp.PlanID);
+                entity.Property(bp => bp.Name).IsRequired().HasMaxLength(200);
+                entity.Property(bp => bp.Amount).HasPrecision(18, 2).IsRequired();
+                entity.Property(bp => bp.LastUpdated).IsRequired();
+                entity.HasOne(bp => bp.Project).WithMany().HasForeignKey(bp => bp.ProjectID).OnDelete(DeleteBehavior.Cascade);
+                entity.HasMany(bp => bp.Expenditures).WithOne(e => e.BudgetPlan).HasForeignKey(e => e.BudgetPlanID).OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // BudgetExpenditure
+            modelBuilder.Entity<BudgetExpenditure>(entity =>
+            {
+                entity.HasKey(be => be.ExpenditureID);
+                entity.Property(be => be.Amount).HasPrecision(18, 2).IsRequired();
+                entity.Property(be => be.TransactionDate).IsRequired();
+                entity.Property(be => be.Description).HasMaxLength(2000);
+                entity.Property(be => be.Field).HasMaxLength(200);
+                entity.HasOne(be => be.BudgetPlan).WithMany(bp => bp.Expenditures).HasForeignKey(be => be.BudgetPlanID).OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(be => be.BudgetCategory).WithMany(bc => bc.Expenditures).HasForeignKey(be => be.BudgetCategoryID).OnDelete(DeleteBehavior.Restrict);
             });
 
             // Seed data for Product

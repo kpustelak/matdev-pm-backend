@@ -1,4 +1,6 @@
-﻿using matdev.Domain.Entities.Lab;
+﻿using matdev.Domain.Entities.LabEntities;
+using matdev.Domain.Entities.LookupEntities;
+using matdev.Domain.Entities.TaskEntities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -33,6 +35,6 @@ namespace matdev.Domain.Entities
         public User CreatedBy { get; set; }
 
         public ICollection<_Task> Tasks { get; set; }
-        public ICollection<LabOrderAssigment> LabOrderAssigments { get; set; }
+        public ICollection<LabOrderAssignment> LabOrderAssigments { get; set; }
     }
 }

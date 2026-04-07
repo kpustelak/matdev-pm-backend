@@ -1,4 +1,5 @@
-﻿using System;
+﻿using matdev.Domain.Entities.TaskEntities;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,7 +13,7 @@ namespace matdev.Domain.Entities
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
 
-        public ICollection<TaskAssigment> TaskAssigments { get; set; }
+        public ICollection<TaskAssignment> TaskAssigments { get; set; }
         public ICollection<TimeEntry> TimeEntries { get; set; }
 
     }

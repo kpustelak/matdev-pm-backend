@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace matdev.Domain.Entities
+namespace matdev.Domain.Entities.LookupEntities
 {
     public class Status
     {

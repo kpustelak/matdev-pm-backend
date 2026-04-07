@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace matdev.Domain.Entities
+namespace matdev.Domain.Entities.LookupEntities
 {
     public class Workpackage
     {
