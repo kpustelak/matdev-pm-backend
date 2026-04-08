@@ -1,7 +1,9 @@
+using matdev.API.Helpers;
 using matdev.Application.Interfaces;
 using matdev.Application.Services;
 using matdev.Domain.Interfaces;
 using matdev.Infrastructure.Data;
+using matdev.Infrastructure.Data.Seeds;
 using matdev.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,6 +29,13 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+await DbMigrate.MigrateDbAsync(app);
+
+using (var scope = app.Services.CreateScope())
+{
+    await SeedData.SeedAsync(scope.ServiceProvider.GetRequiredService<ApplicationDbContext>());
 }
 
 app.UseHttpsRedirection();
