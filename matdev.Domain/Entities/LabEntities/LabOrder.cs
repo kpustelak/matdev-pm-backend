@@ -7,6 +7,8 @@ namespace matdev.Domain.Entities.LabEntities
     public class LabOrder
     {
         public int LabOrderID { get; set; }
+        public int? StatusID { get; set; }
+        public LabOrderStatus Status { get; set; }
         public string Description { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? PlannedCompletionDate { get; set; }

@@ -183,7 +183,8 @@ namespace matdev.Infrastructure.Data.Seeds
             if (!await db.LabOrders.AnyAsync())
             {
                 var project = await db.Projects.FirstAsync();
-                var lo = new LabOrder { Description = "Sample lab order", CreatedAt = DateTime.UtcNow, SampleID = "SAMPLE-001" };
+                var status = await db.LabOrderStatuses.FirstAsync();
+                var lo = new LabOrder { Description = "Sample lab order", CreatedAt = DateTime.UtcNow, SampleID = "SAMPLE-001", Status = status };
                 db.LabOrders.Add(lo);
                 await db.SaveChangesAsync();
 

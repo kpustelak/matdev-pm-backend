@@ -148,6 +148,7 @@ namespace matdev.Infrastructure.Data
                 entity.Property(l => l.Description).HasMaxLength(2000);
                 entity.Property(l => l.CreatedAt).IsRequired();
                 entity.Property(l => l.SampleID).HasMaxLength(100);
+                entity.HasOne(l => l.Status).WithMany().HasForeignKey(l => l.StatusID).OnDelete(DeleteBehavior.SetNull);
             });
 
             // LabOrderStatus
