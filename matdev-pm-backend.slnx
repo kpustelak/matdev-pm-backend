@@ -1,4 +1,7 @@
 <Solution>
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
   <Project Path="matdev.API/matdev.API.csproj" />
   <Project Path="matdev.Application/matdev.Application.csproj" />
   <Project Path="matdev.Domain/matdev.Domain.csproj" />
