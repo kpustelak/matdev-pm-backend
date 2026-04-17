@@ -1,5 +1,6 @@
 using matdev.API.Helpers;
 using matdev.Application.Interfaces;
+using matdev.Application.Mapping;
 using matdev.Application.Services;
 using matdev.Domain.Interfaces;
 using matdev.Infrastructure.Data;
@@ -13,16 +14,24 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<matdev.API.ExceptionHandling.GlobalExceptionHandler>();
 
 
 // Register dependencies And Use InMemory Database
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
 
+builder.Services.AddAutoMapper(typeof(ApplicationMappingProfile).Assembly);
+
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
