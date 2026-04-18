@@ -56,3 +56,9 @@ nunit-*.xml
 .vs/
 .github/
 *.user
+
+# JetBrains Rider / IntelliJ
+.idea/
+
+# Editor-based HTTP Client requests 
+/httpRequests/
