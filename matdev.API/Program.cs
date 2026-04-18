@@ -1,3 +1,4 @@
+using matdev.API.Extensions;
 using matdev.API.Helpers;
 using matdev.Application.Interfaces;
 using matdev.Application.Mapping;
@@ -24,10 +25,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(
 
 builder.Services.AddAutoMapper(typeof(ApplicationMappingProfile).Assembly);
 
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddItemServices();
 
 var app = builder.Build();
 

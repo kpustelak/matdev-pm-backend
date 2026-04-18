@@ -1,6 +1,8 @@
 using AutoMapper;
+using matdev.Application.DTOs.IssueType;
 using matdev.Application.DTOs.User;
 using matdev.Domain.Entities;
+using matdev.Domain.Entities.LookupEntities;
 
 namespace matdev.Application.Mapping;
 
@@ -17,5 +19,12 @@ public class ApplicationMappingProfile : Profile
             .ForMember(d => d.PhoneNumber, opt => opt.MapFrom(s => s.PhoneNumber ?? string.Empty))
             .ForMember(d => d.TaskAssigments, opt => opt.Ignore())
             .ForMember(d => d.TimeEntries, opt => opt.Ignore());
+
+        CreateMap<IssueType,GetIssueTypeDTO>()
+            .ForMember(d => d.IssueTypeId, opt => opt.MapFrom(s => s.IssueTypeID));
+
+        CreateMap<CreateIssueTypeDTO,IssueType>()
+            .ForMember(d => d.IssueTypeID, opt => opt.Ignore())
+            .ForMember(d => d.Name, opt => opt.MapFrom(s => s.Name ?? string.Empty));
     }
 }
