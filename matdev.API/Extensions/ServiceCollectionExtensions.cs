@@ -15,6 +15,8 @@ namespace matdev.API.Extensions
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IIssueTypeService, IssueTypeService>();
             services.AddScoped<IIssueTypeRepository, IssueTypeRepository>();
+            services.AddScoped<IWorkpackageService, WorkpackageService>();
+            services.AddScoped<IWorkpackageRepository, WorkpackageRepository>();
             return services;
         }
     }
