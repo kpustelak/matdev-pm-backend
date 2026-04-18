@@ -23,7 +23,8 @@ builder.Services.AddExceptionHandler<matdev.API.ExceptionHandling.GlobalExceptio
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
 
-builder.Services.AddAutoMapper(typeof(ApplicationMappingProfile).Assembly);
+builder.Services.AddAutoMapper(
+    cfg => cfg.AddProfile<ApplicationMappingProfile>());
 
 builder.Services.AddItemServices();
 

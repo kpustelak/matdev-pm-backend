@@ -1,5 +1,6 @@
 using AutoMapper;
 using matdev.Application.DTOs.IssueType;
+using matdev.Application.DTOs.Topic;
 using matdev.Application.DTOs.User;
 using matdev.Application.DTOs.Workpackage;
 using matdev.Domain.Entities;
@@ -40,5 +41,15 @@ public class ApplicationMappingProfile : Profile
 
         CreateMap<EditWorkpackageDTO, Workpackage>()
             .ForMember(d => d.WorkpackageID, opt => opt.Ignore());
+
+        CreateMap<Topic, GetTopicDTO>()
+            .ForMember(d => d.TopicId, opt => opt.MapFrom(s => s.TopicID));
+
+        CreateMap<CreateTopicDTO, Topic>()
+            .ForMember(d => d.TopicID, opt => opt.Ignore())
+            .ForMember(d => d.Name, opt => opt.MapFrom(s => s.Name ?? string.Empty));
+
+        CreateMap<EditTopicDTO, Topic>()
+            .ForMember(d => d.TopicID, opt => opt.Ignore());
     }
 }

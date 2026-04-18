@@ -30,7 +30,7 @@ namespace matdev.Application.Services
         public async Task<IEnumerable<GetIssueTypeDTO>> GetAllAsync()
         {
             var issueTypes = await _repository.GetAllAsync();
-            return issueTypes.Select(it => _mapper.Map<GetIssueTypeDTO>(it));
+            return _mapper.Map<IEnumerable<GetIssueTypeDTO>>(issueTypes);
         }
         public async Task<GetIssueTypeDTO> CreateAsync(CreateIssueTypeDTO dto)
         {
