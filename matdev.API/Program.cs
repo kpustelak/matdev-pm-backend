@@ -1,3 +1,4 @@
+using matdev.API.Extensions;
 using matdev.API.Helpers;
 using matdev.Application.Interfaces;
 using matdev.Application.Mapping;
@@ -22,12 +23,10 @@ builder.Services.AddExceptionHandler<matdev.API.ExceptionHandling.GlobalExceptio
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
 
-builder.Services.AddAutoMapper(typeof(ApplicationMappingProfile).Assembly);
+builder.Services.AddAutoMapper(
+    cfg => cfg.AddProfile<ApplicationMappingProfile>());
 
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddItemServices();
 
 var app = builder.Build();
 
