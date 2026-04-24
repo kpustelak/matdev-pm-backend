@@ -80,20 +80,23 @@ namespace matdev.Infrastructure.Data.Seeds
                 var status = await db.Statuses.FirstAsync();
                 var priority = await db.Priorities.FirstAsync();
                 var users = await db.Users.Take(2).ToListAsync();
+                var today = DateOnly.FromDateTime(DateTime.UtcNow.Date);
 
                 var projectA = new Project
                 {
                     Name = "Project A",
                     Description = "Sample project A",
                     CreatedAt = DateTime.UtcNow,
-                    IssueType = issueType,
-                    Workpackage = wp,
-                    Topic = topic,
-                    ProjectStatus = status,
-                    Priority = priority,
-                    Responsible = users.ElementAtOrDefault(0),
-                    Support = users.ElementAtOrDefault(1),
-                    CreatedBy = users.ElementAtOrDefault(0)
+                    StartDate = today,
+                    EndDate = today.AddDays(30),
+                    IssueTypeID = issueType.IssueTypeID,
+                    WorkpackageID = wp.WorkpackageID,
+                    TopicID = topic.TopicID,
+                    ProjectStatusID = status.StatusID,
+                    PriorityID = priority.PriorityID,
+                    ResponsibleID = users.ElementAtOrDefault(0)?.UserID,
+                    SupportID = users.ElementAtOrDefault(1)?.UserID,
+                    CreatedByID = users.ElementAtOrDefault(0)?.UserID
                 };
 
                 var projectB = new Project
@@ -101,14 +104,16 @@ namespace matdev.Infrastructure.Data.Seeds
                     Name = "Project B",
                     Description = "Sample project B",
                     CreatedAt = DateTime.UtcNow,
-                    IssueType = issueType,
-                    Workpackage = wp,
-                    Topic = topic,
-                    ProjectStatus = status,
-                    Priority = priority,
-                    Responsible = users.ElementAtOrDefault(1),
-                    Support = users.ElementAtOrDefault(0),
-                    CreatedBy = users.ElementAtOrDefault(1)
+                    StartDate = today.AddDays(1),
+                    EndDate = today.AddDays(45),
+                    IssueTypeID = issueType.IssueTypeID,
+                    WorkpackageID = wp.WorkpackageID,
+                    TopicID = topic.TopicID,
+                    ProjectStatusID = status.StatusID,
+                    PriorityID = priority.PriorityID,
+                    ResponsibleID = users.ElementAtOrDefault(1)?.UserID,
+                    SupportID = users.ElementAtOrDefault(0)?.UserID,
+                    CreatedByID = users.ElementAtOrDefault(1)?.UserID
                 };
 
                 db.Projects.AddRange(projectA, projectB);

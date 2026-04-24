@@ -1,5 +1,6 @@
 using AutoMapper;
 using matdev.Application.DTOs.IssueType;
+using matdev.Application.DTOs.Project;
 using matdev.Application.DTOs.Topic;
 using matdev.Application.DTOs.User;
 using matdev.Application.DTOs.Workpackage;
@@ -51,5 +52,29 @@ public class ApplicationMappingProfile : Profile
 
         CreateMap<EditTopicDTO, Topic>()
             .ForMember(d => d.TopicID, opt => opt.Ignore());
+
+        CreateMap<CreateProjectDTO, Project>()
+            .ForMember(d => d.ProjectID, opt => opt.Ignore())
+            .ForMember(d => d.Name, opt => opt.MapFrom(s => s.ProjectName))
+            .ForMember(d => d.Description, opt => opt.MapFrom(s => s.Description ?? string.Empty))
+            .ForMember(d => d.CreatedAt, opt => opt.Ignore())
+            .ForMember(d => d.IssueTypeID, opt => opt.MapFrom(s => s.IssuetypeId))
+            .ForMember(d => d.WorkpackageID, opt => opt.MapFrom(s => s.WorkpackageId))
+            .ForMember(d => d.TopicID, opt => opt.MapFrom(s => s.TopicId))
+            .ForMember(d => d.ProjectStatusID, opt => opt.MapFrom(s => s.StatusId))
+            .ForMember(d => d.ResponsibleID, opt => opt.MapFrom(s => s.RespPeronId))
+            .ForMember(d => d.SupportID, opt => opt.MapFrom(s => s.SuppPersonId))
+            .ForMember(d => d.PriorityID, opt => opt.MapFrom(s => s.PriorityId))
+            .ForMember(d => d.CreatedByID, opt => opt.Ignore())
+            .ForMember(d => d.IssueType, opt => opt.Ignore())
+            .ForMember(d => d.Workpackage, opt => opt.Ignore())
+            .ForMember(d => d.Topic, opt => opt.Ignore())
+            .ForMember(d => d.ProjectStatus, opt => opt.Ignore())
+            .ForMember(d => d.Priority, opt => opt.Ignore())
+            .ForMember(d => d.Responsible, opt => opt.Ignore())
+            .ForMember(d => d.Support, opt => opt.Ignore())
+            .ForMember(d => d.CreatedBy, opt => opt.Ignore())
+            .ForMember(d => d.Tasks, opt => opt.Ignore())
+            .ForMember(d => d.LabOrderAssigments, opt => opt.Ignore());
     }
 }
