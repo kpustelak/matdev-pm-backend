@@ -17,6 +17,7 @@ namespace matdev.Infrastructure.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Project> Projects { get; set; }
+        public DbSet<ProjectAssignment> ProjectAssignments { get; set; }
         public DbSet<_Task> Tasks { get; set; }
         public DbSet<TaskAssignment> TaskAssignments { get; set; }
         public DbSet<TimeEntry> TimeEntries { get; set; }
@@ -71,6 +72,21 @@ namespace matdev.Infrastructure.Data
                 entity.HasOne(p => p.Responsible).WithMany().HasForeignKey(p => p.ResponsibleID).OnDelete(DeleteBehavior.SetNull);
                 entity.HasOne(p => p.Support).WithMany().HasForeignKey(p => p.SupportID).OnDelete(DeleteBehavior.SetNull);
                 entity.HasOne(p => p.CreatedBy).WithMany().HasForeignKey(p => p.CreatedByID).OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // ProjectAssignment
+            modelBuilder.Entity<ProjectAssignment>(entity =>
+            {
+                entity.HasKey(pa => pa.ProjectAssignmentID);
+                entity.HasIndex(pa => new { pa.ProjectID, pa.UserID }).IsUnique();
+                entity.HasOne(pa => pa.Project)
+                    .WithMany(p => p.ProjectAssignments)
+                    .HasForeignKey(pa => pa.ProjectID)
+                    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(pa => pa.User)
+                    .WithMany(u => u.ProjectAssignments)
+                    .HasForeignKey(pa => pa.UserID)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             // _Task

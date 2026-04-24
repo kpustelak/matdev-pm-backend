@@ -21,6 +21,7 @@ public class ApplicationMappingProfile : Profile
             .ForMember(d => d.Email, opt => opt.MapFrom(s => s.Email ?? string.Empty))
             .ForMember(d => d.PhoneNumber, opt => opt.MapFrom(s => s.PhoneNumber ?? string.Empty))
             .ForMember(d => d.TaskAssigments, opt => opt.Ignore())
+            .ForMember(d => d.ProjectAssignments, opt => opt.Ignore())
             .ForMember(d => d.TimeEntries, opt => opt.Ignore());
 
         CreateMap<IssueType,GetIssueTypeDTO>()
