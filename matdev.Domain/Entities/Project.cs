@@ -35,6 +35,7 @@ namespace matdev.Domain.Entities
         public User CreatedBy { get; set; }
 
         public ICollection<_Task> Tasks { get; set; }
+        public ICollection<ProjectAssignment> ProjectAssignments { get; set; }
         public ICollection<LabOrderAssignment> LabOrderAssigments { get; set; }
     }
 }

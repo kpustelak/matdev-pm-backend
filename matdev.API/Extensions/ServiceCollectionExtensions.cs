@@ -21,6 +21,8 @@ namespace matdev.API.Extensions
             services.AddScoped<ITopicRepository, TopicRepository>();
             services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<IProjectRepository, ProjectRepository>();
+            services.AddScoped<IProjectViewService, ProjectViewService>();
+            services.AddScoped<IProjectViewRepository, ProjectViewRepository>();
             return services;
         }
     }

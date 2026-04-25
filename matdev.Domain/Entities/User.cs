@@ -14,6 +14,7 @@ namespace matdev.Domain.Entities
         public string PhoneNumber { get; set; }
 
         public ICollection<TaskAssignment> TaskAssigments { get; set; }
+        public ICollection<ProjectAssignment> ProjectAssignments { get; set; }
         public ICollection<TimeEntry> TimeEntries { get; set; }
 
     }
