@@ -33,7 +33,7 @@ namespace matdev.Infrastructure.Data
         public DbSet<BudgetCategory> BudgetCategories { get; set; }
         public DbSet<BudgetExpenditure> BudgetExpenditures { get; set; }
         public DbSet<BudgetPlan> BudgetPlans { get; set; }
-
+        public DbSet<TaskCategory> TaskCategories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -102,6 +102,7 @@ namespace matdev.Infrastructure.Data
                 entity.HasOne(t => t.Priority).WithMany().HasForeignKey(t => t.PriorityID).OnDelete(DeleteBehavior.SetNull);
                 entity.HasOne(t => t.ParentTask).WithMany().HasForeignKey(t => t.ParentID).OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(t => t.Requester).WithMany().HasForeignKey(t => t.RequesterID).OnDelete(DeleteBehavior.SetNull);
+                entity.HasOne(t=>t.TaskCategory).WithMany().HasForeignKey(t => t.TaskCategoryID).OnDelete(DeleteBehavior.SetNull);
             });
 
             // TaskAssigment
@@ -110,6 +111,13 @@ namespace matdev.Infrastructure.Data
                 entity.HasKey(a => a.TaskAssignmentID);
                 entity.HasOne(a => a.User).WithMany(u => u.TaskAssigments).HasForeignKey(a => a.UserID).OnDelete(DeleteBehavior.Cascade);
                 entity.HasOne(a => a.Task).WithMany(t => t.Assigments).HasForeignKey(a => a.TaskID).OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // TaskCategory
+            modelBuilder.Entity<TaskCategory>(entity =>
+            {
+                entity.HasKey(tc => tc.TaskCategoryID);
+                entity.Property(tc => tc.Name).IsRequired().HasMaxLength(200);
             });
 
             // TimeEntry
