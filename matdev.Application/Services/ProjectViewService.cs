@@ -134,16 +134,6 @@ public class ProjectViewService : IProjectViewService
         await _repository.DeleteProjectAssignmentAsync(existing);
     }
 
-    public async Task DeleteTaskAsync(int projectId, int taskId)
-    {
-        await GetProjectOrThrow(projectId);
-        var task = await _repository.GetProjectTaskByIdAsync(projectId, taskId);
-        if (task is null)
-            throw new KeyNotFoundException($"Task with id {taskId} was not found in project {projectId}.");
-
-        await _repository.DeleteTaskAsync(task);
-    }
-
     private async Task<Project> GetProjectOrThrow(int projectId)
     {
         var project = await _repository.GetProjectDetailsAsync(projectId);

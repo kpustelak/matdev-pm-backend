@@ -71,12 +71,4 @@ public class ProjectViewController : ControllerBase
         await _service.RemoveUserAsync(projectId, userId);
         return Ok(new ResponseModel<object?> { Data = null, Message = "User removed from project." });
     }
-
-    [HttpDelete("tasks/{taskId:int}")]
-    [ProducesResponseType(typeof(ResponseModel<object?>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ResponseModel<object?>>> DeleteTask([FromRoute] int projectId, [FromRoute] int taskId)
-    {
-        await _service.DeleteTaskAsync(projectId, taskId);
-        return Ok(new ResponseModel<object?> { Data = null, Message = "Task deleted from project." });
-    }
 }
