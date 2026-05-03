@@ -22,6 +22,7 @@ namespace matdev.API.Extensions
             services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<IProjectViewService, ProjectViewService>();
+            services.AddScoped<IProjectTaskListService, ProjectTaskListService>();
             services.AddScoped<IProjectViewRepository, ProjectViewRepository>();
             return services;
         }

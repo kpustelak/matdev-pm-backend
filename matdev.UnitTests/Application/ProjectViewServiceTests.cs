@@ -6,6 +6,7 @@ using matdev.Domain.Entities.LookupEntities;
 using matdev.Domain.Entities.TaskEntities;
 using matdev.Domain.Interfaces;
 using Moq;
+using TaskEntity = matdev.Domain.Entities.TaskEntities._Task;
 
 namespace matdev.UnitTests.Application;
 
@@ -45,7 +46,7 @@ public class ProjectViewServiceTests
 
         var tasks = new[]
         {
-            new _Task { TaskID = 100, Name = "Task 1", IsMilestone = false, SortOrder = 1 }
+            new TaskEntity { TaskID = 100, Name = "Task 1", IsMilestone = false, SortOrder = 1 }
         };
 
         var assignments = new[]
@@ -205,29 +206,5 @@ public class ProjectViewServiceTests
         await _sut.RemoveUserAsync(7, 11);
 
         _repository.Verify(r => r.DeleteProjectAssignmentAsync(assignment), Times.Once);
-    }
-
-    [Fact]
-    public async Task DeleteTaskAsync_WhenTaskMissing_ThrowsKeyNotFoundException()
-    {
-        var project = new Project { ProjectID = 8 };
-        _repository.Setup(r => r.GetProjectDetailsAsync(8)).ReturnsAsync(project);
-        _repository.Setup(r => r.GetProjectTaskByIdAsync(8, 100)).ReturnsAsync((_Task?)null);
-
-        await Assert.ThrowsAsync<KeyNotFoundException>(() => _sut.DeleteTaskAsync(8, 100));
-    }
-
-    [Fact]
-    public async Task DeleteTaskAsync_WhenExists_CallsDelete()
-    {
-        var project = new Project { ProjectID = 8 };
-        var task = new _Task { TaskID = 100 };
-
-        _repository.Setup(r => r.GetProjectDetailsAsync(8)).ReturnsAsync(project);
-        _repository.Setup(r => r.GetProjectTaskByIdAsync(8, 100)).ReturnsAsync(task);
-
-        await _sut.DeleteTaskAsync(8, 100);
-
-        _repository.Verify(r => r.DeleteTaskAsync(task), Times.Once);
     }
 }

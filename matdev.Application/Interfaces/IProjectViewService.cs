@@ -11,5 +11,4 @@ public interface IProjectViewService
     Task ChangeProjectDeadlineAsync(int projectId, ChangeProjectDeadlineDTO dto);
     Task AssignUserAsync(int projectId, AssignUserToProjectDTO dto);
     Task RemoveUserAsync(int projectId, int userId);
-    Task DeleteTaskAsync(int projectId, int taskId);
 }
