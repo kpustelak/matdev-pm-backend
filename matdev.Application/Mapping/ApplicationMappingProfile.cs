@@ -1,11 +1,13 @@
 using AutoMapper;
 using matdev.Application.DTOs.IssueType;
 using matdev.Application.DTOs.Project;
+using matdev.Application.DTOs.TaskCategory;
 using matdev.Application.DTOs.Topic;
 using matdev.Application.DTOs.User;
 using matdev.Application.DTOs.Workpackage;
 using matdev.Domain.Entities;
 using matdev.Domain.Entities.LookupEntities;
+using matdev.Domain.Entities.TaskEntities;
 
 namespace matdev.Application.Mapping;
 
@@ -53,6 +55,16 @@ public class ApplicationMappingProfile : Profile
 
         CreateMap<EditTopicDTO, Topic>()
             .ForMember(d => d.TopicID, opt => opt.Ignore());
+
+        CreateMap<TaskCategory, GetTaskCategoryDTO>()
+            .ForMember(d => d.TaskCategoryId, opt => opt.MapFrom(s => s.TaskCategoryID));
+
+        CreateMap<CreateTaskCategoryDTO, TaskCategory>()
+            .ForMember(d => d.TaskCategoryID, opt => opt.Ignore())
+            .ForMember(d => d.Name, opt => opt.MapFrom(s => s.Name ?? string.Empty));
+
+        CreateMap<EditTaskCategoryDTO, TaskCategory>()
+            .ForMember(d => d.TaskCategoryID, opt => opt.Ignore());
 
         CreateMap<CreateProjectDTO, Project>()
             .ForMember(d => d.ProjectID, opt => opt.Ignore())

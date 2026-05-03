@@ -19,6 +19,8 @@ namespace matdev.API.Extensions
             services.AddScoped<IWorkpackageRepository, WorkpackageRepository>();
             services.AddScoped<ITopicService, TopicService>();
             services.AddScoped<ITopicRepository, TopicRepository>();
+            services.AddScoped<ITaskCategoryService, TaskCategoryService>();
+            services.AddScoped<ITaskCategoryRepository, TaskCategoryRepository>();
             services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<IProjectViewService, ProjectViewService>();
