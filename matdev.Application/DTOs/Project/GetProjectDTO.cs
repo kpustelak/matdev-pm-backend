@@ -12,4 +12,11 @@ public sealed record GetProjectDTO(
     int? IssuetypeId,
     int? RespPeronId,
     int? SuppPersonId,
-    int? WorkpackageId);
+    int? WorkpackageId,
+    string? TopicName,
+    string? WorkpackageName,
+    string? IssueTypeName,
+    string? StatusName,
+    string? PriorityName,
+    string? ResponsibleDisplayName,
+    string? SupportDisplayName);

@@ -1,3 +1,4 @@
+using matdev.Application.DTOs.Project;
 using matdev.Application.DTOs.ProjectView;
 using matdev.Application.Interfaces;
 using matdev.Domain.Entities;
@@ -12,6 +13,30 @@ public class ProjectViewService : IProjectViewService
     public ProjectViewService(IProjectViewRepository repository)
     {
         _repository = repository;
+    }
+
+    public async Task<ProjectCreateLookupsDTO> GetProjectCreateFormLookupsAsync()
+    {
+        var issueTypes = await _repository.GetIssueTypesAsync();
+        var topics = await _repository.GetTopicsAsync();
+        var workpackages = await _repository.GetWorkpackagesAsync();
+        var statuses = await _repository.GetStatusesAsync();
+        var priorities = await _repository.GetPrioritiesAsync();
+        var users = await _repository.GetUsersAsync();
+
+        return new ProjectCreateLookupsDTO(
+            issueTypes.Select(i => new LookupOption(i.IssueTypeID, i.Name ?? string.Empty)).ToList(),
+            topics.Select(t => new LookupOption(t.TopicID, t.Name ?? string.Empty)).ToList(),
+            workpackages.Select(w => new LookupOption(w.WorkpackageID, w.Name ?? string.Empty)).ToList(),
+            statuses.Select(s => new LookupOption(s.StatusID, s.Name ?? string.Empty)).ToList(),
+            priorities.Select(p => new LookupOption(p.PriorityID, p.Name ?? string.Empty)).ToList(),
+            users
+                .Select(u => new UserLookupOption(
+                    u.UserID,
+                    u.FirstName ?? string.Empty,
+                    u.LastName ?? string.Empty,
+                    $"{u.FirstName} {u.LastName}".Trim()))
+                .ToList());
     }
 
     public async Task<GetProjectViewDataDTO> GetProjectPageAsync(int projectId)

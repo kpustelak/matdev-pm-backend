@@ -10,10 +10,21 @@ namespace matdev.API.Controllers;
 public class ProjectController : ControllerBase
 {
     private readonly IProjectService _service;
+    private readonly IProjectViewService _projectViewService;
 
-    public ProjectController(IProjectService service)
+    public ProjectController(IProjectService service, IProjectViewService projectViewService)
     {
         _service = service;
+        _projectViewService = projectViewService;
+    }
+
+    /// <summary>Dropdown data for creating a project (IDs from DB — not tied to an existing project).</summary>
+    [HttpGet("lookups/for-create")]
+    [ProducesResponseType(typeof(ResponseModel<ProjectCreateLookupsDTO>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ResponseModel<ProjectCreateLookupsDTO>>> GetCreateFormLookups()
+    {
+        var data = await _projectViewService.GetProjectCreateFormLookupsAsync();
+        return Ok(new ResponseModel<ProjectCreateLookupsDTO> { Data = data, Message = "Lookups loaded." });
     }
 
     [HttpPost]

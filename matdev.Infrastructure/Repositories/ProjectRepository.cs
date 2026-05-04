@@ -14,14 +14,30 @@ public class ProjectRepository : IProjectRepository
         _context = context;
     }
 
+    private static IQueryable<Project> ProjectsWithLookups(ApplicationDbContext ctx) =>
+        ctx.Projects
+            .AsNoTracking()
+            .Include(p => p.Topic)
+            .Include(p => p.Workpackage)
+            .Include(p => p.IssueType)
+            .Include(p => p.ProjectStatus)
+            .Include(p => p.Priority)
+            .Include(p => p.Responsible)
+            .Include(p => p.Support);
+
     public async Task<Project?> GetByIdAsync(int id)
     {
-        return await _context.Projects.FindAsync(id);
+        return await ProjectsWithLookups(_context).FirstOrDefaultAsync(p => p.ProjectID == id);
+    }
+
+    public async Task<Project?> GetByIdForUpdateAsync(int id)
+    {
+        return await _context.Projects.FirstOrDefaultAsync(p => p.ProjectID == id);
     }
 
     public async Task<IEnumerable<Project>> GetAllAsync()
     {
-        return await _context.Projects.ToListAsync();
+        return await ProjectsWithLookups(_context).ToListAsync();
     }
 
     public async Task<Project> AddAsync(Project entity)
@@ -49,7 +65,7 @@ public class ProjectRepository : IProjectRepository
             return Array.Empty<Project>();
 
         var term = s.Trim().ToLowerInvariant();
-        return await _context.Projects
+        return await ProjectsWithLookups(_context)
             .Where(p =>
                 (p.Name ?? string.Empty).ToLower().Contains(term)
                 || (p.Description ?? string.Empty).ToLower().Contains(term))

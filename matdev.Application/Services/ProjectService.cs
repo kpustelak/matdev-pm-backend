@@ -38,12 +38,13 @@ public class ProjectService : IProjectService
         project.CreatedAt = DateTime.UtcNow;
 
         var created = await _repository.AddAsync(project);
-        return MapToDto(created);
+        var reloaded = await _repository.GetByIdAsync(created.ProjectID);
+        return MapToDto(reloaded ?? created);
     }
 
     public async Task<GetProjectDTO> UpdateAsync(EditProjectDTO dto)
     {
-        var existing = await _repository.GetByIdAsync(dto.ProjectId);
+        var existing = await _repository.GetByIdForUpdateAsync(dto.ProjectId);
         if (existing is null)
             throw new KeyNotFoundException($"Project with id {dto.ProjectId} was not found.");
 
@@ -84,12 +85,13 @@ public class ProjectService : IProjectService
             existing.Description = dto.Description;
 
         await _repository.UpdateAsync(existing);
-        return MapToDto(existing);
+        var refreshed = await _repository.GetByIdAsync(existing.ProjectID);
+        return MapToDto(refreshed ?? existing);
     }
 
     public async Task DeleteAsync(int id)
     {
-        var project = await _repository.GetByIdAsync(id);
+        var project = await _repository.GetByIdForUpdateAsync(id);
         if (project is null)
             throw new KeyNotFoundException($"Project with id {id} was not found.");
 
@@ -119,6 +121,23 @@ public class ProjectService : IProjectService
             project.IssueTypeID,
             project.ResponsibleID,
             project.SupportID,
-            project.WorkpackageID);
+            project.WorkpackageID,
+            project.Topic?.Name,
+            project.Workpackage?.Name,
+            project.IssueType?.Name,
+            project.ProjectStatus?.Name,
+            project.Priority?.Name,
+            FormatUser(project.Responsible),
+            FormatUser(project.Support));
+    }
+
+    private static string? FormatUser(User? user)
+    {
+        if (user is null)
+            return null;
+        var first = user.FirstName?.Trim() ?? string.Empty;
+        var last = user.LastName?.Trim() ?? string.Empty;
+        var combined = $"{first} {last}".Trim();
+        return string.IsNullOrEmpty(combined) ? null : combined;
     }
 }

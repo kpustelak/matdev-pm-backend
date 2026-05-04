@@ -1,9 +1,12 @@
+using matdev.Application.DTOs.Project;
 using matdev.Application.DTOs.ProjectView;
 
 namespace matdev.Application.Interfaces;
 
 public interface IProjectViewService
 {
+    Task<ProjectCreateLookupsDTO> GetProjectCreateFormLookupsAsync();
+
     Task<GetProjectViewDataDTO> GetProjectPageAsync(int projectId);
     Task<IEnumerable<GetProjectViewAssignedUserDTO>> GetAssignableUsersAsync(int projectId);
     Task<IEnumerable<GetProjectViewEditProjectFormDTO>> GetEditProjectFormDataAsync(int projectId);
