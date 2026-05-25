@@ -305,6 +305,84 @@ public class ProjectViewRepository : IProjectViewRepository
         }
     }
 
+    public async Task<_Task?> GetTaskViewDataAsync(int projectId, int taskId)
+    {
+        return await _context.Tasks
+            .Include(t => t.Status)
+            .Include(t => t.Priority)
+            .Include(t => t.TaskCategory)
+            .Include(t => t.Requester)
+            .Include(t => t.Assigments)
+                .ThenInclude(a => a.User)
+            .FirstOrDefaultAsync(t => t.ProjectID == projectId && t.TaskID == taskId);
+    }
+
+    public async Task<IReadOnlyList<TaskAssignment>> GetTaskAssignmentsAsync(int taskId)
+    {
+        return await _context.TaskAssignments
+            .Include(a => a.User)
+            .Where(a => a.TaskID == taskId)
+            .OrderBy(a => a.User.LastName)
+            .ThenBy(a => a.User.FirstName)
+            .ToListAsync();
+    }
+
+    public async Task<TaskAssignment?> GetTaskAssignmentAsync(int taskId, int userId)
+    {
+        return await _context.TaskAssignments
+            .FirstOrDefaultAsync(a => a.TaskID == taskId && a.UserID == userId);
+    }
+
+    public async Task AddTaskAssignmentAsync(TaskAssignment assignment)
+    {
+        await _context.TaskAssignments.AddAsync(assignment);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteTaskAssignmentAsync(TaskAssignment assignment)
+    {
+        _context.TaskAssignments.Remove(assignment);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateTaskWithAssignmentsAsync(_Task task, IReadOnlyList<int> newAssignedUserIds)
+    {
+        await using var tx = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            _context.Tasks.Update(task);
+            await _context.SaveChangesAsync();
+
+            var existing = await _context.TaskAssignments
+                .Where(a => a.TaskID == task.TaskID)
+                .ToListAsync();
+
+            _context.TaskAssignments.RemoveRange(existing);
+            await _context.SaveChangesAsync();
+
+            var distinct = newAssignedUserIds.Distinct().ToList();
+            foreach (var uid in distinct)
+            {
+                _context.TaskAssignments.Add(new TaskAssignment
+                {
+                    UserID = uid,
+                    TaskID = task.TaskID
+                });
+            }
+
+            if (distinct.Count > 0)
+                await _context.SaveChangesAsync();
+
+            await tx.CommitAsync();
+        }
+        catch
+        {
+            await tx.RollbackAsync();
+            _context.ChangeTracker.Clear();
+            throw;
+        }
+    }
+
     private static void CollectPostOrderIds(int rootId, IReadOnlyList<(int Id, int? ParentId)> all, List<int> output)
     {
         foreach (var (childId, _) in all.Where(x => x.ParentId == rootId))

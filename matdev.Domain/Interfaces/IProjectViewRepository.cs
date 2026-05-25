@@ -50,4 +50,10 @@ public interface IProjectViewRepository
     Task UpdateProjectAsync(Project project);
     Task DeleteProjectAssignmentAsync(ProjectAssignment assignment);
     Task DeleteTaskAsync(_Task task);
+    Task<_Task?> GetTaskViewDataAsync(int projectId, int taskId);
+    Task<IReadOnlyList<TaskAssignment>> GetTaskAssignmentsAsync(int taskId);
+    Task<TaskAssignment?> GetTaskAssignmentAsync(int taskId, int userId);
+    Task AddTaskAssignmentAsync(TaskAssignment assignment);
+    Task DeleteTaskAssignmentAsync(TaskAssignment assignment);
+    Task UpdateTaskWithAssignmentsAsync(_Task task, IReadOnlyList<int> newAssignedUserIds);
 }
