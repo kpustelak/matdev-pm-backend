@@ -141,6 +141,15 @@ public class TaskViewService : ITaskViewService
         await _repository.UpdateTaskAsync(subtask);
     }
 
+    public async Task ChangeSubtaskEndDateAsync(int projectId, int subtaskId, ChangeSubtaskEndDateDTO dto)
+    {
+        await RequireProjectAsync(projectId);
+        var subtask = await RequireTaskAsync(projectId, subtaskId);
+
+        subtask.EndDate = dto.EndDate;
+        await _repository.UpdateTaskAsync(subtask);
+    }
+
     public async Task<GetTaskEditFormDTO> GetEditFormAsync(int projectId)
     {
         await RequireProjectAsync(projectId);
@@ -311,12 +320,16 @@ public class TaskViewService : ITaskViewService
         var siblings = await _repository.GetProjectTaskSubtasksAsync(projectId, parentId.Value);
         if (!siblings.Any()) return;
 
-        var completedCount = siblings.Count(s =>
-            s.Status?.Name.Equals("DONE", StringComparison.OrdinalIgnoreCase) == true ||
-            s.Status?.Name.Equals("COMPLETED", StringComparison.OrdinalIgnoreCase) == true);
+        var completedCount = siblings.Count(s => IsDoneStatus(s.Status?.Name));
 
         parent.Progress = Math.Round((decimal)completedCount / siblings.Count * 100, 2);
         await _repository.UpdateTaskAsync(parent);
+    }
+
+    private static bool IsDoneStatus(string? status)
+    {
+        var s = (status ?? string.Empty).Trim().ToLowerInvariant();
+        return s.Contains("done") || s.Contains("closed") || s.Contains("completed") || s.Contains("finish");
     }
 
     private static IReadOnlyList<GetTaskViewAssignedUserDTO> MapAssignments(IEnumerable<TaskAssignment> assignments) =>

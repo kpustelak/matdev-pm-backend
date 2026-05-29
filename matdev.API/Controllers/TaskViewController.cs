@@ -117,6 +117,18 @@ public class TaskViewController : ControllerBase
         return Ok(new ResponseModel<object?> { Data = null, Message = "Subtask start date changed." });
     }
 
+    [HttpPatch("subtasks/{subtaskId:int}/end-date")]
+    [ProducesResponseType(typeof(ResponseModel<object?>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ResponseModel<object?>>> ChangeSubtaskEndDate(
+        [FromRoute] int projectId,
+        [FromRoute] int taskId,
+        [FromRoute] int subtaskId,
+        [FromBody] ChangeSubtaskEndDateDTO dto)
+    {
+        await _service.ChangeSubtaskEndDateAsync(projectId, subtaskId, dto);
+        return Ok(new ResponseModel<object?> { Data = null, Message = "Subtask end date changed." });
+    }
+
     [HttpGet("edit-form")]
     [ProducesResponseType(typeof(ResponseModel<GetTaskEditFormDTO>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ResponseModel<GetTaskEditFormDTO>>> GetEditForm(

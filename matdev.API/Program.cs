@@ -28,6 +28,16 @@ builder.Services.AddAutoMapper(
 
 builder.Services.AddItemServices();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:3000", "http://127.0.0.1:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 app.UseExceptionHandler();
@@ -48,7 +58,13 @@ using (var scope = app.Services.CreateScope())
 
 app.UseHttpsRedirection();
 
+app.UseCors();
+
 app.UseAuthorization();
+
+app.MapGet("/api/health", () => Results.Ok(new { utc = DateTime.UtcNow.ToString("o") }))
+    .WithName("Health")
+    .WithTags("Health");
 
 app.MapControllers();
 

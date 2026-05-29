@@ -33,10 +33,15 @@ public class ProjectViewRepository : IProjectViewRepository
         return await _context.Tasks
             .Include(t => t.Status)
             .Include(t => t.Priority)
+            .Include(t => t.Subtasks).ThenInclude(s => s.Status)
+            .Include(t => t.Subtasks).ThenInclude(s => s.Priority)
             .Where(t => t.ProjectID == projectId
                 && t.ParentID == null
-                && t.Status != null
-                && (t.Status.Name == "TODO" || t.Status.Name == "IN PROGRESS"))
+                && (t.Status == null ||
+                    (!EF.Functions.ILike(t.Status.Name, "%done%") &&
+                     !EF.Functions.ILike(t.Status.Name, "%closed%") &&
+                     !EF.Functions.ILike(t.Status.Name, "%completed%") &&
+                     !EF.Functions.ILike(t.Status.Name, "%finish%"))))
             .OrderBy(t => t.SortOrder)
             .ToListAsync();
     }
@@ -58,6 +63,8 @@ public class ProjectViewRepository : IProjectViewRepository
             .Include(t => t.Status)
             .Include(t => t.Priority)
             .Include(t => t.TaskCategory)
+            .Include(t => t.Subtasks).ThenInclude(s => s.Status)
+            .Include(t => t.Subtasks).ThenInclude(s => s.Priority)
             .Where(t => t.ProjectID == projectId && t.ParentID == null);
 
         if (milestonesOnly)
@@ -92,6 +99,23 @@ public class ProjectViewRepository : IProjectViewRepository
             .Where(t => t.ProjectID == projectId && t.ParentID == parentTaskId)
             .OrderBy(t => t.SortOrder)
             .ThenBy(t => t.TaskID)
+            .ToListAsync();
+    }
+
+    public async Task<IReadOnlyList<_Task>> GetActiveTasksWithUpcomingDeadlinesAsync(int projectId, DateTime cutoff)
+    {
+        return await _context.Tasks
+            .AsNoTracking()
+            .Include(t => t.Status)
+            .Where(t =>
+                t.ProjectID == projectId &&
+                t.ParentID == null &&
+                t.EndDate <= cutoff &&
+                (t.Status == null ||
+                    (!EF.Functions.ILike(t.Status.Name, "%done%") &&
+                     !EF.Functions.ILike(t.Status.Name, "%closed%") &&
+                     !EF.Functions.ILike(t.Status.Name, "%completed%"))))
+            .OrderBy(t => t.EndDate)
             .ToListAsync();
     }
 

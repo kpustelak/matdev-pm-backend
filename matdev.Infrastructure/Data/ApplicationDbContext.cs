@@ -17,6 +17,7 @@ namespace matdev.Infrastructure.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Project> Projects { get; set; }
+        public DbSet<ProjectRisk> ProjectRisks { get; set; }
         public DbSet<ProjectAssignment> ProjectAssignments { get; set; }
         public DbSet<_Task> Tasks { get; set; }
         public DbSet<TaskAssignment> TaskAssignments { get; set; }
@@ -74,6 +75,15 @@ namespace matdev.Infrastructure.Data
                 entity.HasOne(p => p.CreatedBy).WithMany().HasForeignKey(p => p.CreatedByID).OnDelete(DeleteBehavior.SetNull);
             });
 
+            // ProjectRisk
+            modelBuilder.Entity<ProjectRisk>(entity =>
+            {
+                entity.HasKey(r => r.RiskID);
+                entity.Property(r => r.Severity).IsRequired().HasMaxLength(20);
+                entity.Property(r => r.Description).IsRequired().HasMaxLength(500);
+                entity.HasOne(r => r.Project).WithMany().HasForeignKey(r => r.ProjectID).OnDelete(DeleteBehavior.Cascade);
+            });
+
             // ProjectAssignment
             modelBuilder.Entity<ProjectAssignment>(entity =>
             {
@@ -100,7 +110,7 @@ namespace matdev.Infrastructure.Data
                 entity.HasOne(t => t.Project).WithMany(p => p.Tasks).HasForeignKey(t => t.ProjectID).OnDelete(DeleteBehavior.Cascade);
                 entity.HasOne(t => t.Status).WithMany().HasForeignKey(t => t.StatusID).OnDelete(DeleteBehavior.SetNull);
                 entity.HasOne(t => t.Priority).WithMany().HasForeignKey(t => t.PriorityID).OnDelete(DeleteBehavior.SetNull);
-                entity.HasOne(t => t.ParentTask).WithMany().HasForeignKey(t => t.ParentID).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(t => t.ParentTask).WithMany(t => t.Subtasks).HasForeignKey(t => t.ParentID).OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(t => t.Requester).WithMany().HasForeignKey(t => t.RequesterID).OnDelete(DeleteBehavior.SetNull);
                 entity.HasOne(t=>t.TaskCategory).WithMany().HasForeignKey(t => t.TaskCategoryID).OnDelete(DeleteBehavior.SetNull);
             });

@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using AutoMapper;
 using matdev.Application.DTOs.User;
 using matdev.Application.Interfaces;
@@ -34,6 +35,7 @@ public class UserService : IUserService
 
     public async Task<GetUserDTO> CreateAsync(CreateUserDTO dto)
     {
+        ValidatePhone(dto.PhoneNumber);
         var user = await _repository.AddAsync(_mapper.Map<User>(dto));
         return _mapper.Map<GetUserDTO>(user);
     }
@@ -47,6 +49,8 @@ public class UserService : IUserService
         if (dto.FirstName is null && dto.LastName is null && dto.Email is null && dto.PhoneNumber is null)
             throw new ArgumentException("Send at least one field to update (firstName, lastName, email, or phoneNumber).");
 
+        ValidatePhone(dto.PhoneNumber);
+
         if (dto.FirstName is not null)
             existing.FirstName = dto.FirstName;
         if (dto.LastName is not null)
@@ -58,6 +62,22 @@ public class UserService : IUserService
 
         await _repository.UpdateAsync(existing);
         return _mapper.Map<GetUserDTO>(existing);
+    }
+
+    /// <summary>
+    /// Phone must contain only digits, spaces, dashes, parentheses, and an optional leading +.
+    /// The digit count must be between 7 and 15 (ITU-T E.164 range).
+    /// </summary>
+    private static void ValidatePhone(string? phone)
+    {
+        if (string.IsNullOrWhiteSpace(phone)) return;
+
+        if (!Regex.IsMatch(phone, @"^\+?[\d\s\-\(\)]+$"))
+            throw new ArgumentException("Phone number may only contain digits, spaces, dashes, and parentheses.");
+
+        var digitCount = phone.Count(char.IsDigit);
+        if (digitCount < 9 || digitCount > 15)
+            throw new ArgumentException("Phone number must contain between 9 and 15 digits.");
     }
 
     public async Task DeleteAsync(int id)

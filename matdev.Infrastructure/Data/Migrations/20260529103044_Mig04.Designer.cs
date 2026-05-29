@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using matdev.Infrastructure.Data;
@@ -11,9 +12,11 @@ using matdev.Infrastructure.Data;
 namespace matdev.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260529103044_Mig04")]
+    partial class Mig04
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -425,40 +428,6 @@ namespace matdev.Infrastructure.Data.Migrations
                     b.ToTable("ProjectAssignments");
                 });
 
-            modelBuilder.Entity("matdev.Domain.Entities.ProjectRisk", b =>
-                {
-                    b.Property<int>("RiskID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RiskID"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<bool>("IsResolved")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("ProjectID")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Severity")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.HasKey("RiskID");
-
-                    b.HasIndex("ProjectID");
-
-                    b.ToTable("ProjectRisks");
-                });
-
             modelBuilder.Entity("matdev.Domain.Entities.TaskEntities.TaskAssignment", b =>
                 {
                     b.Property<int>("TaskAssignmentID")
@@ -799,17 +768,6 @@ namespace matdev.Infrastructure.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("matdev.Domain.Entities.ProjectRisk", b =>
-                {
-                    b.HasOne("matdev.Domain.Entities.Project", "Project")
-                        .WithMany()
-                        .HasForeignKey("ProjectID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-                });
-
             modelBuilder.Entity("matdev.Domain.Entities.TaskEntities.TaskAssignment", b =>
                 {
                     b.HasOne("matdev.Domain.Entities.TaskEntities._Task", "Task")
@@ -851,7 +809,7 @@ namespace matdev.Infrastructure.Data.Migrations
             modelBuilder.Entity("matdev.Domain.Entities.TaskEntities._Task", b =>
                 {
                     b.HasOne("matdev.Domain.Entities.TaskEntities._Task", "ParentTask")
-                        .WithMany("Subtasks")
+                        .WithMany()
                         .HasForeignKey("ParentID")
                         .OnDelete(DeleteBehavior.Restrict);
 
@@ -935,8 +893,6 @@ namespace matdev.Infrastructure.Data.Migrations
             modelBuilder.Entity("matdev.Domain.Entities.TaskEntities._Task", b =>
                 {
                     b.Navigation("Assigments");
-
-                    b.Navigation("Subtasks");
 
                     b.Navigation("TimeEntries");
                 });

@@ -2,6 +2,7 @@ using AutoMapper;
 using matdev.Application.DTOs.Project;
 using matdev.Application.Interfaces;
 using matdev.Domain.Entities;
+using matdev.Domain.Entities.BudgetEntities;
 using matdev.Domain.Interfaces;
 
 namespace matdev.Application.Services;
@@ -9,11 +10,13 @@ namespace matdev.Application.Services;
 public class ProjectService : IProjectService
 {
     private readonly IProjectRepository _repository;
+    private readonly IBudgetRepository _budgetRepository;
     private readonly IMapper _mapper;
 
-    public ProjectService(IProjectRepository repository, IMapper mapper)
+    public ProjectService(IProjectRepository repository, IBudgetRepository budgetRepository, IMapper mapper)
     {
         _repository = repository;
+        _budgetRepository = budgetRepository;
         _mapper = mapper;
     }
 
@@ -23,13 +26,18 @@ public class ProjectService : IProjectService
         if (project is null)
             throw new KeyNotFoundException($"Project with id {id} was not found.");
 
-        return MapToDto(project);
+        var plan = await _budgetRepository.GetBudgetPlanByProjectAsync(id);
+        return MapToDto(project, plan);
     }
 
     public async Task<IEnumerable<GetProjectDTO>> GetAllAsync()
     {
         var projects = await _repository.GetAllAsync();
-        return projects.Select(MapToDto);
+        var plans = await _budgetRepository.GetAllBudgetPlansAsync();
+        var planByProject = plans.ToDictionary(p => p.ProjectID);
+
+        return projects.Select(p =>
+            MapToDto(p, planByProject.TryGetValue(p.ProjectID, out var plan) ? plan : null));
     }
 
     public async Task<GetProjectDTO> CreateAsync(CreateProjectDTO dto)
@@ -38,7 +46,7 @@ public class ProjectService : IProjectService
         project.CreatedAt = DateTime.UtcNow;
 
         var created = await _repository.AddAsync(project);
-        return MapToDto(created);
+        return MapToDto(created, null);
     }
 
     public async Task<GetProjectDTO> UpdateAsync(EditProjectDTO dto)
@@ -84,7 +92,8 @@ public class ProjectService : IProjectService
             existing.Description = dto.Description;
 
         await _repository.UpdateAsync(existing);
-        return MapToDto(existing);
+        var plan = await _budgetRepository.GetBudgetPlanByProjectAsync(existing.ProjectID);
+        return MapToDto(existing, plan);
     }
 
     public async Task DeleteAsync(int id)
@@ -100,13 +109,22 @@ public class ProjectService : IProjectService
     {
         var projects = await _repository.GetByPhraseAsync(s);
         if (!projects.Any())
-            throw new KeyNotFoundException("There is no project with matching data.");
+            return Enumerable.Empty<GetProjectDTO>();
 
-        return projects.Select(MapToDto);
+        var plans = await _budgetRepository.GetAllBudgetPlansAsync();
+        var planByProject = plans.ToDictionary(p => p.ProjectID);
+
+        return projects.Select(p =>
+            MapToDto(p, planByProject.TryGetValue(p.ProjectID, out var plan) ? plan : null));
     }
 
-    private static GetProjectDTO MapToDto(Project project)
+    private static GetProjectDTO MapToDto(Project project, BudgetPlan? plan)
     {
+        decimal? budgetAmount = plan?.Amount;
+        decimal? budgetSpent = plan is not null
+            ? plan.Expenditures?.Sum(e => e.Amount) ?? 0m
+            : null;
+
         return new GetProjectDTO(
             project.ProjectID,
             project.Name,
@@ -119,6 +137,8 @@ public class ProjectService : IProjectService
             project.IssueTypeID,
             project.ResponsibleID,
             project.SupportID,
-            project.WorkpackageID);
+            project.WorkpackageID,
+            budgetAmount,
+            budgetSpent);
     }
 }

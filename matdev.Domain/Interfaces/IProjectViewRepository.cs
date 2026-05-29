@@ -19,6 +19,9 @@ public interface IProjectViewRepository
 
     Task<IReadOnlyList<_Task>> GetProjectTaskSubtasksAsync(int projectId, int parentTaskId);
 
+    /// <summary>Returns top-level tasks that are not done/closed and whose deadline is on or before <paramref name="cutoff"/>.</summary>
+    Task<IReadOnlyList<_Task>> GetActiveTasksWithUpcomingDeadlinesAsync(int projectId, DateTime cutoff);
+
     Task<int> GetNextTopLevelTaskSortOrderAsync(int projectId);
 
     Task<int> GetNextSubtaskSortOrderAsync(int projectId, int parentTaskId);

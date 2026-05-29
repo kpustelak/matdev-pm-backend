@@ -15,6 +15,7 @@ public interface ITaskViewService
     Task DeleteSubtaskAsync(int projectId, int subtaskId);
     Task ChangeSubtaskStatusAsync(int projectId, int subtaskId, ChangeSubtaskStatusDTO dto);
     Task ChangeSubtaskStartDateAsync(int projectId, int subtaskId, ChangeSubtaskStartDateDTO dto);
+    Task ChangeSubtaskEndDateAsync(int projectId, int subtaskId, ChangeSubtaskEndDateDTO dto);
 
     Task<GetTaskEditFormDTO> GetEditFormAsync(int projectId);
     Task<GetTaskViewDTO> EditTaskAsync(int projectId, int taskId, EditTaskDTO dto);

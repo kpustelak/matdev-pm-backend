@@ -31,6 +31,7 @@ namespace matdev.Domain.Entities.TaskEntities
         public User Requester { get; set; }
         public TaskCategory TaskCategory { get; set; }
 
+        public ICollection<_Task> Subtasks { get; set; }
         public ICollection<TaskAssignment> Assigments { get; set; }
         public ICollection<TimeEntry> TimeEntries { get; set; }
 
