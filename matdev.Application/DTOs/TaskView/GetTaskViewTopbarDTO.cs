@@ -14,5 +14,6 @@ public record GetTaskViewTopbarDTO(
     string TaskPriority,
     int? PriorityId,
     decimal TaskProgress,
-    bool IsMilestone
+    bool IsMilestone,
+    decimal? EstimatedCost
 );

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using matdev.Infrastructure.Data;
@@ -11,9 +12,11 @@ using matdev.Infrastructure.Data;
 namespace matdev.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260603132922_AddBudgetPlanLines")]
+    partial class AddBudgetPlanLines
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -74,9 +77,6 @@ namespace matdev.Infrastructure.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<int?>("TaskID")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -85,8 +85,6 @@ namespace matdev.Infrastructure.Data.Migrations
                     b.HasIndex("BudgetCategoryID");
 
                     b.HasIndex("BudgetPlanID");
-
-                    b.HasIndex("TaskID");
 
                     b.ToTable("BudgetExpenditures");
                 });
@@ -583,10 +581,6 @@ namespace matdev.Infrastructure.Data.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal?>("EstimatedCost")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
-
                     b.Property<bool>("IsMilestone")
                         .HasColumnType("boolean");
 
@@ -716,16 +710,9 @@ namespace matdev.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("matdev.Domain.Entities.TaskEntities._Task", "Task")
-                        .WithMany()
-                        .HasForeignKey("TaskID")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.Navigation("BudgetCategory");
 
                     b.Navigation("BudgetPlan");
-
-                    b.Navigation("Task");
                 });
 
             modelBuilder.Entity("matdev.Domain.Entities.BudgetEntities.BudgetPlan", b =>

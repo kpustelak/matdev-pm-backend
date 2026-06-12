@@ -68,6 +68,25 @@ public class ProjectRiskService : IProjectRiskService
                     CreatedAt: now,
                     IsAutomatic: true));
             }
+
+            var spendByTask = (budget.Expenditures ?? Array.Empty<Domain.Entities.BudgetEntities.BudgetExpenditure>())
+                .Where(e => e.TaskID is not null)
+                .GroupBy(e => e.TaskID!.Value)
+                .ToDictionary(g => g.Key, g => g.Sum(e => e.Amount));
+
+            foreach (var (taskId, taskSpent) in spendByTask)
+            {
+                var task = await _viewRepository.GetProjectTaskByIdAsync(projectId, taskId);
+                if (task?.EstimatedCost is not > 0 || taskSpent <= task.EstimatedCost) continue;
+
+                result.Add(new GetProjectRiskDTO(
+                    RiskId: -(task.TaskID + 1_000_000),
+                    Severity: "Medium",
+                    Description: $"Task \"{task.Name}\" over estimate: spent {taskSpent:0.##} of {task.EstimatedCost:0.##} PLN",
+                    IsResolved: false,
+                    CreatedAt: now,
+                    IsAutomatic: true));
+            }
         }
 
         return result;

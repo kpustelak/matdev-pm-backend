@@ -10,10 +10,12 @@ namespace matdev.Application.Services;
 public class TaskViewService : ITaskViewService
 {
     private readonly IProjectViewRepository _repository;
+    private readonly IBudgetRepository _budgetRepository;
 
-    public TaskViewService(IProjectViewRepository repository)
+    public TaskViewService(IProjectViewRepository repository, IBudgetRepository budgetRepository)
     {
         _repository = repository;
+        _budgetRepository = budgetRepository;
     }
 
     public async Task<GetTaskViewDTO> GetTaskViewAsync(int projectId, int taskId)
@@ -24,10 +26,13 @@ public class TaskViewService : ITaskViewService
         var subtasks = await _repository.GetProjectTaskSubtasksAsync(projectId, taskId);
         var assignments = await _repository.GetTaskAssignmentsAsync(taskId);
 
+        var costs = await BuildTaskCostsAsync(projectId, taskId, task);
+
         return new GetTaskViewDTO(
             MapToTopbar(task),
             subtasks.Select(MapToSubtask).ToList(),
-            MapAssignments(assignments));
+            MapAssignments(assignments),
+            costs);
     }
 
     public async Task ChangeTaskStatusAsync(int projectId, int taskId, ChangeTaskViewStatusDTO dto)
@@ -197,6 +202,9 @@ public class TaskViewService : ITaskViewService
             task.TaskCategoryID = categoryId;
         }
 
+        if (dto.EstimatedCost is decimal estimatedCost)
+            task.EstimatedCost = estimatedCost > 0 ? estimatedCost : null;
+
         if (dto.AssignedUserIds is not null)
         {
             var distinct = dto.AssignedUserIds.Distinct().ToList();
@@ -335,6 +343,22 @@ public class TaskViewService : ITaskViewService
     private static IReadOnlyList<GetTaskViewAssignedUserDTO> MapAssignments(IEnumerable<TaskAssignment> assignments) =>
         assignments.Select(a => new GetTaskViewAssignedUserDTO(a.User.UserID, a.User.FirstName, a.User.LastName)).ToList();
 
+    private async Task<GetTaskViewCostsDTO> BuildTaskCostsAsync(int projectId, int taskId, _Task task)
+    {
+        var spent = await _budgetRepository.GetTaskExpenditureSumAsync(projectId, taskId);
+        var rows = await _budgetRepository.GetExpendituresForTaskAsync(projectId, taskId);
+        var expenditures = rows
+            .Select(e => new TaskLinkedExpenditureDTO(
+                e.ExpenditureID,
+                e.BudgetCategory.Name,
+                e.Amount,
+                e.TransactionDate,
+                e.Description))
+            .ToList();
+
+        return new GetTaskViewCostsDTO(task.EstimatedCost, spent, expenditures);
+    }
+
     private static GetTaskViewTopbarDTO MapToTopbar(_Task t) => new(
         t.TaskID,
         t.Name,
@@ -349,7 +373,8 @@ public class TaskViewService : ITaskViewService
         t.Priority?.Name ?? string.Empty,
         t.PriorityID,
         t.Progress,
-        t.IsMilestone);
+        t.IsMilestone,
+        t.EstimatedCost);
 
     private static GetTaskViewSubtaskDTO MapToSubtask(_Task t) => new(
         t.TaskID,

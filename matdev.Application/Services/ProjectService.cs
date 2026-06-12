@@ -109,7 +109,7 @@ public class ProjectService : IProjectService
     {
         var projects = await _repository.GetByPhraseAsync(s);
         if (!projects.Any())
-            return Enumerable.Empty<GetProjectDTO>();
+            throw new KeyNotFoundException($"No projects found containing the phrase '{s}'.");
 
         var plans = await _budgetRepository.GetAllBudgetPlansAsync();
         var planByProject = plans.ToDictionary(p => p.ProjectID);

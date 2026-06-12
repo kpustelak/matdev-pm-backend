@@ -3,6 +3,7 @@ namespace matdev.Application.DTOs.ProjectTaskList;
 public sealed record GetProjectTaskListItemDTO(
     int TaskId,
     string Name,
+    string? Description,
     string Status,
     string Priority,
     int? StatusId,

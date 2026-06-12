@@ -23,7 +23,8 @@ namespace matdev.Domain.Entities.TaskEntities
         public int? ParentID { get; set; }
         public int? RequesterID { get; set; }
         public int? TaskCategoryID { get; set; }
-        
+        public decimal? EstimatedCost { get; set; }
+
         public Project Project { get; set; }
         public Status Status { get; set; }
         public Priority Priority { get; set; }

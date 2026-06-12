@@ -218,6 +218,7 @@ public class ProjectTaskListService : IProjectTaskListService
         return new GetProjectTaskListItemDTO(
             t.TaskID,
             t.Name,
+            t.Description,
             t.Status?.Name ?? string.Empty,
             t.Priority?.Name ?? string.Empty,
             t.StatusID,

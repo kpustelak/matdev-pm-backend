@@ -1,7 +1,6 @@
 services:
   matdev.api:
     image: ${DOCKER_REGISTRY-}matdevapi
-    container_name: matdev.api
     build:
       context: .
       dockerfile: matdev.API/Dockerfile
@@ -9,13 +8,12 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__Database=Host=matdev.database;Port=5432;Database=matdev;Username=postgres;Password=postgres
     ports:
+      - "5196:8080"
       - "8080:8080"
-      - "8081:8081"
     depends_on:
       - matdev.database
   matdev.database:
     image: postgres:18.3
-    container_name: matdev.database
     environment:
       - POSTGRES_DB=matdev
       - POSTGRES_USER=postgres

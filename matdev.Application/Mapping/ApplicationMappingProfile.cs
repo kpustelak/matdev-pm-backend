@@ -88,6 +88,7 @@ public class ApplicationMappingProfile : Profile
             .ForMember(d => d.Support, opt => opt.Ignore())
             .ForMember(d => d.CreatedBy, opt => opt.Ignore())
             .ForMember(d => d.Tasks, opt => opt.Ignore())
+            .ForMember(d => d.ProjectAssignments, opt => opt.Ignore())
             .ForMember(d => d.LabOrderAssigments, opt => opt.Ignore());
     }
 }

@@ -19,7 +19,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<matdev.API.ExceptionHandling.GlobalExceptionHandler>();
 
 
-// Register dependencies And Use InMemory Database
+// Register dependencies and PostgreSQL (see ConnectionStrings:Database)
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("Database")));
 
@@ -56,7 +56,10 @@ using (var scope = app.Services.CreateScope())
     await SeedData.SeedAsync(scope.ServiceProvider.GetRequiredService<ApplicationDbContext>());
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors();
 
