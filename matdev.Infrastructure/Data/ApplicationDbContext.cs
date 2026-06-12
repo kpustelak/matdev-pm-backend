@@ -184,6 +184,10 @@ namespace matdev.Infrastructure.Data
                 entity.Property(l => l.Description).HasMaxLength(2000);
                 entity.Property(l => l.CreatedAt).IsRequired();
                 entity.Property(l => l.SampleID).HasMaxLength(100);
+                entity.Property(l => l.TestReportFileName).HasMaxLength(255);
+                entity.Property(l => l.TestReportLink).HasMaxLength(2000);
+                entity.Property(l => l.FinalReportFileName).HasMaxLength(255);
+                entity.Property(l => l.FinalReportLink).HasMaxLength(2000);
                 entity.HasOne(l => l.Status).WithMany().HasForeignKey(l => l.StatusID).OnDelete(DeleteBehavior.SetNull);
             });
 

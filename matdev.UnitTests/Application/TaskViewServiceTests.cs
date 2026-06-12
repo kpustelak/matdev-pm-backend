@@ -2,6 +2,7 @@ using matdev.Application.DTOs.TaskView;
 using matdev.Application.Interfaces;
 using matdev.Application.Services;
 using matdev.Domain.Entities;
+using matdev.Domain.Entities.BudgetEntities;
 using matdev.Domain.Entities.LookupEntities;
 using matdev.Domain.Entities.TaskEntities;
 using matdev.Domain.Interfaces;
@@ -22,7 +23,7 @@ public class TaskViewServiceTests
     {
         _budgetRepository.Setup(b => b.GetTaskExpenditureSumAsync(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(0m);
         _budgetRepository.Setup(b => b.GetExpendituresForTaskAsync(It.IsAny<int>(), It.IsAny<int>()))
-            .ReturnsAsync(Array.Empty<Domain.Entities.BudgetEntities.BudgetExpenditure>());
+            .ReturnsAsync(Array.Empty<BudgetExpenditure>());
         _sut = new TaskViewService(_repository.Object, _budgetRepository.Object);
     }
 

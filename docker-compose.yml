@@ -7,6 +7,9 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__Database=Host=matdev.database;Port=5432;Database=matdev;Username=postgres;Password=postgres
+      - FileStorage__RootPath=/app/uploads
+    volumes:
+      - lab_uploads:/app/uploads
     ports:
       - "5196:8080"
       - "8080:8080"
@@ -24,4 +27,5 @@ services:
       - "5432:5432"
 volumes:
   database_pgdata: { }
+  lab_uploads: { }
   
