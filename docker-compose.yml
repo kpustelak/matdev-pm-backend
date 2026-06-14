@@ -1,0 +1,31 @@
+services:
+  matdev.api:
+    image: ${DOCKER_REGISTRY-}matdevapi
+    build:
+      context: .
+      dockerfile: matdev.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Database=Host=matdev.database;Port=5432;Database=matdev;Username=postgres;Password=postgres
+      - FileStorage__RootPath=/app/uploads
+    volumes:
+      - lab_uploads:/app/uploads
+    ports:
+      - "5196:8080"
+      - "8080:8080"
+    depends_on:
+      - matdev.database
+  matdev.database:
+    image: postgres:18.3
+    environment:
+      - POSTGRES_DB=matdev
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes: 
+      - database_pgdata:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+volumes:
+  database_pgdata: { }
+  lab_uploads: { }
+  

@@ -28,6 +28,9 @@ project.lock.json
 project.fragment.lock.json
 artifacts/
 
+# Uploaded lab report files (local dev)
+uploads/
+
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 
@@ -52,3 +55,13 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+.vs/
+.github/
+*.user
+
+# JetBrains Rider / IntelliJ
+.idea/
+
+# Editor-based HTTP Client requests 
+/httpRequests/
