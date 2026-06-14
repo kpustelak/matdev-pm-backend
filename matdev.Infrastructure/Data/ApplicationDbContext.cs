@@ -17,6 +17,7 @@ namespace matdev.Infrastructure.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Project> Projects { get; set; }
+        public DbSet<ProjectRisk> ProjectRisks { get; set; }
         public DbSet<ProjectAssignment> ProjectAssignments { get; set; }
         public DbSet<_Task> Tasks { get; set; }
         public DbSet<TaskAssignment> TaskAssignments { get; set; }
@@ -33,6 +34,7 @@ namespace matdev.Infrastructure.Data
         public DbSet<BudgetCategory> BudgetCategories { get; set; }
         public DbSet<BudgetExpenditure> BudgetExpenditures { get; set; }
         public DbSet<BudgetPlan> BudgetPlans { get; set; }
+        public DbSet<BudgetPlanLine> BudgetPlanLines { get; set; }
         public DbSet<TaskCategory> TaskCategories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -74,6 +76,15 @@ namespace matdev.Infrastructure.Data
                 entity.HasOne(p => p.CreatedBy).WithMany().HasForeignKey(p => p.CreatedByID).OnDelete(DeleteBehavior.SetNull);
             });
 
+            // ProjectRisk
+            modelBuilder.Entity<ProjectRisk>(entity =>
+            {
+                entity.HasKey(r => r.RiskID);
+                entity.Property(r => r.Severity).IsRequired().HasMaxLength(20);
+                entity.Property(r => r.Description).IsRequired().HasMaxLength(500);
+                entity.HasOne(r => r.Project).WithMany().HasForeignKey(r => r.ProjectID).OnDelete(DeleteBehavior.Cascade);
+            });
+
             // ProjectAssignment
             modelBuilder.Entity<ProjectAssignment>(entity =>
             {
@@ -96,11 +107,12 @@ namespace matdev.Infrastructure.Data
                 entity.Property(t => t.Name).IsRequired().HasMaxLength(200);
                 entity.Property(t => t.Description).HasMaxLength(2000);
                 entity.Property(t => t.Progress).HasPrecision(5, 2);
+                entity.Property(t => t.EstimatedCost).HasPrecision(18, 2);
 
                 entity.HasOne(t => t.Project).WithMany(p => p.Tasks).HasForeignKey(t => t.ProjectID).OnDelete(DeleteBehavior.Cascade);
                 entity.HasOne(t => t.Status).WithMany().HasForeignKey(t => t.StatusID).OnDelete(DeleteBehavior.SetNull);
                 entity.HasOne(t => t.Priority).WithMany().HasForeignKey(t => t.PriorityID).OnDelete(DeleteBehavior.SetNull);
-                entity.HasOne(t => t.ParentTask).WithMany().HasForeignKey(t => t.ParentID).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(t => t.ParentTask).WithMany(t => t.Subtasks).HasForeignKey(t => t.ParentID).OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(t => t.Requester).WithMany().HasForeignKey(t => t.RequesterID).OnDelete(DeleteBehavior.SetNull);
                 entity.HasOne(t=>t.TaskCategory).WithMany().HasForeignKey(t => t.TaskCategoryID).OnDelete(DeleteBehavior.SetNull);
             });
@@ -172,6 +184,10 @@ namespace matdev.Infrastructure.Data
                 entity.Property(l => l.Description).HasMaxLength(2000);
                 entity.Property(l => l.CreatedAt).IsRequired();
                 entity.Property(l => l.SampleID).HasMaxLength(100);
+                entity.Property(l => l.TestReportFileName).HasMaxLength(255);
+                entity.Property(l => l.TestReportLink).HasMaxLength(2000);
+                entity.Property(l => l.FinalReportFileName).HasMaxLength(255);
+                entity.Property(l => l.FinalReportLink).HasMaxLength(2000);
                 entity.HasOne(l => l.Status).WithMany().HasForeignKey(l => l.StatusID).OnDelete(DeleteBehavior.SetNull);
             });
 
@@ -225,6 +241,15 @@ namespace matdev.Infrastructure.Data
                 entity.Property(bp => bp.LastUpdated).IsRequired();
                 entity.HasOne(bp => bp.Project).WithMany().HasForeignKey(bp => bp.ProjectID).OnDelete(DeleteBehavior.Cascade);
                 entity.HasMany(bp => bp.Expenditures).WithOne(e => e.BudgetPlan).HasForeignKey(e => e.BudgetPlanID).OnDelete(DeleteBehavior.Cascade);
+                entity.HasMany(bp => bp.Lines).WithOne(l => l.Plan).HasForeignKey(l => l.PlanID).OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<BudgetPlanLine>(entity =>
+            {
+                entity.HasKey(l => l.LineID);
+                entity.Property(l => l.AllocatedAmount).HasPrecision(18, 2).IsRequired();
+                entity.HasIndex(l => new { l.PlanID, l.CategoryID }).IsUnique();
+                entity.HasOne(l => l.Category).WithMany().HasForeignKey(l => l.CategoryID).OnDelete(DeleteBehavior.Restrict);
             });
 
             // BudgetExpenditure
@@ -237,6 +262,7 @@ namespace matdev.Infrastructure.Data
                 entity.Property(be => be.Field).HasMaxLength(200);
                 entity.HasOne(be => be.BudgetPlan).WithMany(bp => bp.Expenditures).HasForeignKey(be => be.BudgetPlanID).OnDelete(DeleteBehavior.Cascade);
                 entity.HasOne(be => be.BudgetCategory).WithMany(bc => bc.Expenditures).HasForeignKey(be => be.BudgetCategoryID).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(be => be.Task).WithMany().HasForeignKey(be => be.TaskID).OnDelete(DeleteBehavior.SetNull);
             });
 
             // Seed data for Product

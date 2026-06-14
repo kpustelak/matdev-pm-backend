@@ -214,9 +214,11 @@ public class ProjectTaskListService : IProjectTaskListService
 
     private static GetProjectTaskListItemDTO MapToTaskListItem(_Task t)
     {
+        var progress = ComputeProgress(t);
         return new GetProjectTaskListItemDTO(
             t.TaskID,
             t.Name,
+            t.Description,
             t.Status?.Name ?? string.Empty,
             t.Priority?.Name ?? string.Empty,
             t.StatusID,
@@ -226,9 +228,37 @@ public class ProjectTaskListService : IProjectTaskListService
             t.EndDate,
             t.ParentID,
             t.SortOrder,
-            t.Progress,
+            progress,
             t.TaskCategoryID,
             t.TaskCategory?.Name);
+    }
+
+    private static decimal ComputeProgress(_Task t)
+    {
+        var subtasks = t.Subtasks;
+        if (subtasks is null || subtasks.Count == 0)
+            return IsDoneStatus(t.Status?.Name) ? 100m : t.Progress;
+
+        var totalWeight = subtasks.Sum(s => PriorityWeight(s.Priority?.Name));
+        if (totalWeight == 0) return 0;
+
+        var doneWeight = subtasks
+            .Where(s => IsDoneStatus(s.Status?.Name))
+            .Sum(s => PriorityWeight(s.Priority?.Name));
+
+        return Math.Round((decimal)doneWeight / totalWeight * 100, 0);
+    }
+
+    private static int PriorityWeight(string? priority)
+    {
+        var p = (priority ?? string.Empty).Trim().ToLowerInvariant();
+        return p switch { "high" => 3, "low" => 1, _ => 2 };
+    }
+
+    private static bool IsDoneStatus(string? status)
+    {
+        var s = (status ?? string.Empty).Trim().ToLowerInvariant();
+        return s.Contains("closed") || s.Contains("done") || s.Contains("completed") || s.Contains("finish");
     }
 
     private static TaskListSortBy ParseTaskListSortBy(string? sortBy)

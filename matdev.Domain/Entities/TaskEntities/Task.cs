@@ -23,7 +23,8 @@ namespace matdev.Domain.Entities.TaskEntities
         public int? ParentID { get; set; }
         public int? RequesterID { get; set; }
         public int? TaskCategoryID { get; set; }
-        
+        public decimal? EstimatedCost { get; set; }
+
         public Project Project { get; set; }
         public Status Status { get; set; }
         public Priority Priority { get; set; }
@@ -31,6 +32,7 @@ namespace matdev.Domain.Entities.TaskEntities
         public User Requester { get; set; }
         public TaskCategory TaskCategory { get; set; }
 
+        public ICollection<_Task> Subtasks { get; set; }
         public ICollection<TaskAssignment> Assigments { get; set; }
         public ICollection<TimeEntry> TimeEntries { get; set; }
 

@@ -74,6 +74,9 @@ namespace matdev.Infrastructure.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<int?>("TaskID")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -82,6 +85,8 @@ namespace matdev.Infrastructure.Data.Migrations
                     b.HasIndex("BudgetCategoryID");
 
                     b.HasIndex("BudgetPlanID");
+
+                    b.HasIndex("TaskID");
 
                     b.ToTable("BudgetExpenditures");
                 });
@@ -116,6 +121,37 @@ namespace matdev.Infrastructure.Data.Migrations
                     b.ToTable("BudgetPlans");
                 });
 
+            modelBuilder.Entity("matdev.Domain.Entities.BudgetEntities.BudgetPlanLine", b =>
+                {
+                    b.Property<int>("LineID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("LineID"));
+
+                    b.Property<int?>("AlertThresholdPercent")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("AllocatedAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<int>("CategoryID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PlanID")
+                        .HasColumnType("integer");
+
+                    b.HasKey("LineID");
+
+                    b.HasIndex("CategoryID");
+
+                    b.HasIndex("PlanID", "CategoryID")
+                        .IsUnique();
+
+                    b.ToTable("BudgetPlanLines");
+                });
+
             modelBuilder.Entity("matdev.Domain.Entities.LabEntities.LabOrder", b =>
                 {
                     b.Property<int>("LabOrderID")
@@ -135,7 +171,18 @@ namespace matdev.Infrastructure.Data.Migrations
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
 
+                    b.Property<string>("FinalReportFileName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("FinalReportLink")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
                     b.Property<DateTime?>("PlannedCompletionDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("PredictedCompletionDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("SampleID")
@@ -144,6 +191,14 @@ namespace matdev.Infrastructure.Data.Migrations
 
                     b.Property<int?>("StatusID")
                         .HasColumnType("integer");
+
+                    b.Property<string>("TestReportFileName")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("TestReportLink")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
 
                     b.HasKey("LabOrderID");
 
@@ -425,6 +480,40 @@ namespace matdev.Infrastructure.Data.Migrations
                     b.ToTable("ProjectAssignments");
                 });
 
+            modelBuilder.Entity("matdev.Domain.Entities.ProjectRisk", b =>
+                {
+                    b.Property<int>("RiskID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RiskID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("IsResolved")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("ProjectID")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Severity")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.HasKey("RiskID");
+
+                    b.HasIndex("ProjectID");
+
+                    b.ToTable("ProjectRisks");
+                });
+
             modelBuilder.Entity("matdev.Domain.Entities.TaskEntities.TaskAssignment", b =>
                 {
                     b.Property<int>("TaskAssignmentID")
@@ -512,6 +601,10 @@ namespace matdev.Infrastructure.Data.Migrations
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("EstimatedCost")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<bool>("IsMilestone")
                         .HasColumnType("boolean");
@@ -642,9 +735,16 @@ namespace matdev.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("matdev.Domain.Entities.TaskEntities._Task", "Task")
+                        .WithMany()
+                        .HasForeignKey("TaskID")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("BudgetCategory");
 
                     b.Navigation("BudgetPlan");
+
+                    b.Navigation("Task");
                 });
 
             modelBuilder.Entity("matdev.Domain.Entities.BudgetEntities.BudgetPlan", b =>
@@ -656,6 +756,25 @@ namespace matdev.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("matdev.Domain.Entities.BudgetEntities.BudgetPlanLine", b =>
+                {
+                    b.HasOne("matdev.Domain.Entities.BudgetEntities.BudgetCategory", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("matdev.Domain.Entities.BudgetEntities.BudgetPlan", "Plan")
+                        .WithMany("Lines")
+                        .HasForeignKey("PlanID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Plan");
                 });
 
             modelBuilder.Entity("matdev.Domain.Entities.LabEntities.LabOrder", b =>
@@ -765,6 +884,17 @@ namespace matdev.Infrastructure.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("matdev.Domain.Entities.ProjectRisk", b =>
+                {
+                    b.HasOne("matdev.Domain.Entities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("matdev.Domain.Entities.TaskEntities.TaskAssignment", b =>
                 {
                     b.HasOne("matdev.Domain.Entities.TaskEntities._Task", "Task")
@@ -806,7 +936,7 @@ namespace matdev.Infrastructure.Data.Migrations
             modelBuilder.Entity("matdev.Domain.Entities.TaskEntities._Task", b =>
                 {
                     b.HasOne("matdev.Domain.Entities.TaskEntities._Task", "ParentTask")
-                        .WithMany()
+                        .WithMany("Subtasks")
                         .HasForeignKey("ParentID")
                         .OnDelete(DeleteBehavior.Restrict);
 
@@ -876,6 +1006,8 @@ namespace matdev.Infrastructure.Data.Migrations
             modelBuilder.Entity("matdev.Domain.Entities.BudgetEntities.BudgetPlan", b =>
                 {
                     b.Navigation("Expenditures");
+
+                    b.Navigation("Lines");
                 });
 
             modelBuilder.Entity("matdev.Domain.Entities.Project", b =>
@@ -890,6 +1022,8 @@ namespace matdev.Infrastructure.Data.Migrations
             modelBuilder.Entity("matdev.Domain.Entities.TaskEntities._Task", b =>
                 {
                     b.Navigation("Assigments");
+
+                    b.Navigation("Subtasks");
 
                     b.Navigation("TimeEntries");
                 });

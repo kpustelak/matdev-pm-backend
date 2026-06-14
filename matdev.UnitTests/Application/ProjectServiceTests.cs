@@ -2,6 +2,7 @@ using matdev.Application.DTOs.Project;
 using matdev.Application.Interfaces;
 using matdev.Application.Services;
 using matdev.Domain.Entities;
+using matdev.Domain.Entities.BudgetEntities;
 using matdev.Domain.Interfaces;
 using Moq;
 
@@ -10,11 +11,22 @@ namespace matdev.UnitTests.Application;
 public class ProjectServiceTests
 {
     private readonly Mock<IProjectRepository> _repository = new();
+    private readonly Mock<IBudgetRepository> _budgetRepository = new();
     private readonly IProjectService _sut;
 
     public ProjectServiceTests()
     {
-        _sut = new ProjectService(_repository.Object, TestMapperFactory.Create());
+        _budgetRepository
+            .Setup(r => r.GetBudgetPlanByProjectAsync(It.IsAny<int>()))
+            .ReturnsAsync((BudgetPlan?)null);
+        _budgetRepository
+            .Setup(r => r.GetAllBudgetPlansAsync())
+            .ReturnsAsync(Array.Empty<BudgetPlan>());
+
+        _sut = new ProjectService(
+            _repository.Object,
+            _budgetRepository.Object,
+            TestMapperFactory.Create());
     }
 
     [Fact]

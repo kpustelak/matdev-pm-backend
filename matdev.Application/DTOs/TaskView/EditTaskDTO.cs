@@ -12,4 +12,5 @@ public class EditTaskDTO
     public DateTime? EndDate { get; set; }
     public string? TaskDescription { get; set; }
     public int? TaskCategoryId { get; set; }
+    public decimal? EstimatedCost { get; set; }
 }

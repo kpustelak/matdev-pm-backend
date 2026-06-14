@@ -54,6 +54,7 @@ public class ProjectTaskListServiceTests
             {
                 TaskID = 10,
                 Name = "A",
+                Description = "Task desc",
                 ParentID = null,
                 SortOrder = 1,
                 Progress = 0,
@@ -74,6 +75,7 @@ public class ProjectTaskListServiceTests
         Assert.Single(result.Items);
         Assert.Equal(10, result.Items[0].TaskId);
         Assert.Equal("A", result.Items[0].Name);
+        Assert.Equal("Task desc", result.Items[0].Description);
         Assert.Equal(1, result.TotalCount);
     }
 

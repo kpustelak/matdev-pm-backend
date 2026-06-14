@@ -2,6 +2,7 @@
 using matdev.Application.Services;
 using matdev.Domain.Interfaces;
 using matdev.Infrastructure.Repositories;
+using matdev.Infrastructure.Storage;
 
 namespace matdev.API.Extensions
 {
@@ -27,6 +28,13 @@ namespace matdev.API.Extensions
             services.AddScoped<IProjectTaskListService, ProjectTaskListService>();
             services.AddScoped<ITaskViewService, TaskViewService>();
             services.AddScoped<IProjectViewRepository, ProjectViewRepository>();
+            services.AddScoped<IBudgetRepository, BudgetRepository>();
+            services.AddScoped<IBudgetService, BudgetService>();
+            services.AddScoped<IProjectRiskRepository, ProjectRiskRepository>();
+            services.AddScoped<IProjectRiskService, ProjectRiskService>();
+            services.AddScoped<ILabOrderRepository, LabOrderRepository>();
+            services.AddScoped<ILabOrderService, LabOrderService>();
+            services.AddSingleton<ILabOrderFileStorage, LabOrderFileStorage>();
             return services;
         }
     }

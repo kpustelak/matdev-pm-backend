@@ -2,6 +2,7 @@ using matdev.Application.DTOs.TaskView;
 using matdev.Application.Interfaces;
 using matdev.Application.Services;
 using matdev.Domain.Entities;
+using matdev.Domain.Entities.BudgetEntities;
 using matdev.Domain.Entities.LookupEntities;
 using matdev.Domain.Entities.TaskEntities;
 using matdev.Domain.Interfaces;
@@ -13,13 +14,17 @@ namespace matdev.UnitTests.Application;
 public class TaskViewServiceTests
 {
     private readonly Mock<IProjectViewRepository> _repository = new();
+    private readonly Mock<IBudgetRepository> _budgetRepository = new();
     private readonly ITaskViewService _sut;
 
     private static readonly DateTime Now = new(2026, 5, 1, 0, 0, 0, DateTimeKind.Utc);
 
     public TaskViewServiceTests()
     {
-        _sut = new TaskViewService(_repository.Object);
+        _budgetRepository.Setup(b => b.GetTaskExpenditureSumAsync(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(0m);
+        _budgetRepository.Setup(b => b.GetExpendituresForTaskAsync(It.IsAny<int>(), It.IsAny<int>()))
+            .ReturnsAsync(Array.Empty<BudgetExpenditure>());
+        _sut = new TaskViewService(_repository.Object, _budgetRepository.Object);
     }
 
     // ── Shared builders ───────────────────────────────────────────────────────
